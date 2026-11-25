@@ -14,7 +14,7 @@ export async function api(path, options = {}) {
   const data = await response.json().catch(() => ({}))
   if (!response.ok) {
     const messages = {400: 'Проверьте введённые данные.', 403: 'Нет доступа. Войдите как администратор.', 404: 'Запись не найдена.', 500: 'Ошибка сервера. Попробуйте позже.'}
-    throw { status: response.status, data, message: data.detail || messages[response.status] || 'Ошибка запроса.' }
+    throw { status: response.status, data, message: response.status === 404 ? messages[404] : data.detail || messages[response.status] || 'Ошибка запроса.' }
   }
   return data
 }

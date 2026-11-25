@@ -1,5 +1,6 @@
 from datetime import timedelta
 from django.db.models import Count
+from django.db.models.deletion import ProtectedError
 from django.utils import timezone
 from django_filters import rest_framework as filters
 from rest_framework import permissions, viewsets
@@ -45,6 +46,12 @@ class ServiceViewSet(viewsets.ModelViewSet):
     filterset_class = ServiceFilter
     search_fields = ('name', 'description')
     ordering_fields = ('price',)
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            return super().destroy(request, *args, **kwargs)
+        except ProtectedError:
+            return Response({'detail': 'Нельзя удалить услугу, на которую есть заявки.'}, status=400)
 
     def get_queryset(self):
         qs = Service.objects.select_related('category').order_by('id')
