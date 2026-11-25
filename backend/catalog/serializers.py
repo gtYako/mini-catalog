@@ -15,23 +15,25 @@ class ServiceSerializer(serializers.ModelSerializer):
         read_only_fields = ('created_at',)
 
 class ServiceRequestSerializer(serializers.ModelSerializer):
-    service_id = serializers.PrimaryKeyRelatedField(source='service', queryset=Service.objects.all())
     class Meta:
         model = ServiceRequest
-        fields = ('id', 'service_id', 'client_name', 'phone', 'desired_at', 'status', 'created_at')
+        fields = ('id', 'service', 'client_name', 'phone', 'desired_at', 'status', 'created_at')
         read_only_fields = ('status', 'created_at')
 
-    def validate_service_id(self, service):
+    # Валидация поля service (проверка доступности)
+    def validate_service(self, service):
         if not service.is_available:
             raise serializers.ValidationError('Услуга недоступна.')
         return service
 
+    # Валидация даты
     def validate_desired_at(self, value):
         if value <= timezone.now():
             raise serializers.ValidationError('Укажите будущую дату.')
         return value
 
+    # Валидация телефона
     def validate_phone(self, value):
-        if not value.strip():
+        if not value or not value.strip():
             raise serializers.ValidationError('Укажите телефон.')
         return value.strip()
