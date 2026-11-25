@@ -27,7 +27,6 @@ export default function Favorites({ favorites, toggle }) {
   }, [favorites, retry])
 
   return <><h1>Избранное</h1>
-    <p>Избранное хранится только в этом браузере.</p>
     {!favorites.length ? <p>Пока ничего нет. <Link to="/">Перейти в каталог</Link></p> :
       loading ? <Loading/> : error ? <div role="alert">{error} <button onClick={() => setRetry(retry + 1)}>Повторить</button></div> : <>
         <div className="cards">{items.map(service => <ServiceCard key={service.id} service={service} favorites={favorites} toggle={toggle}/>)}</div>
